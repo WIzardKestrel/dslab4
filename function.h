@@ -37,7 +37,7 @@ void insert(struct nodeClass ** head, int id, int grade) {
         temp -> studentPtr = insort(temp -> studentPtr, id, grade);
     }
 }
-snode * insort(snode * head, int id, int grade){
+snode * insort(snode * head, int id, int grade){ // insert and sort
     snode *temp, *ptr = (snode*)malloc(sizeof(struct nodeStudent)), *t = (snode*)malloc(sizeof(struct nodeStudent));
     ptr -> midterm = grade;
     ptr -> studentID = id;
@@ -48,7 +48,16 @@ snode * insort(snode * head, int id, int grade){
         head = ptr;
         return head;
     }
-    while(temp -> next != NULL && temp -> next -> midterm > grade){
+    if(head -> midterm == grade){
+        while(temp -> next != NULL && temp -> next -> studentID <= id){
+            //printf("passing\n");
+            temp = temp->next;
+        }
+        ptr -> next = temp -> next;
+        temp -> next = ptr;
+        return head;
+    }
+    while(temp -> next != NULL && temp -> next -> midterm >= grade){
         //printf("passing\n");
         temp = temp->next;
     }
