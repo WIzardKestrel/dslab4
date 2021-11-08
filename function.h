@@ -1,81 +1,98 @@
 typedef struct nodeClass
 {
-	int classID;
-	double   classMidtermAverage;
-	struct nodeClass *next;
-	struct nodeStudent *studentPtr;
-}nodeClass;
+    int classID;
+    double classMidtermAverage;
+    struct nodeClass *next;
+    struct nodeStudent *studentPtr;
+}cnode;
 
 typedef struct nodeStudent
 {
-	int studentID;
-	int midterm;
-	struct nodeStudent *next;
-}nodeStudent;
-// prototypes:
-void createNodeClass(nodeClass **);
-void print(nodeClass *);
-nodeStudent *insort(nodeStudent *, int, int);
-
-// functions:
-void insert(nodeClass ** head, int stdId, int grade){
-    if(*head == NULL) {
-        createNodeClass(head);
+    int studentID;
+    int midterm;
+    struct nodeStudent *next;
+}snode;
+struct nodeClass *createClass(struct nodeClass * head);
+struct nodeStudent * insort(struct nodeStudent * head, int id, int grade);
+void printA(struct nodeClass * head);
+void insert(struct nodeClass ** head, int id, int grade) {
+    if (*head == NULL){
+        *head = createClass(*head);
+        //printA(*head);
+    }else{
+        cnode * temp = *head;
+        snode * sTemp = NULL;
+        int stdId = id;
+        int classID = (int)(stdId / 10000) - 6;
+        for (int i = 0; i < classID; ++i) {
+            temp = temp -> next;
+        }
+        temp -> studentPtr = insort(temp -> studentPtr, id, grade);
+        if(temp -> studentPtr == NULL)
+            printf("its nul\n");
     }
-    nodeClass *temp = *head;
-    int classID = (int)(stdId / 10000) - 5;
-    for (int i = 0; i < classID; ++i) {
-        temp = temp -> next;
-    }
-    temp->studentPtr = insort(temp->studentPtr, stdId, grade);
-
 }
-
-nodeStudent * insort(nodeStudent * head, int id, int grade){
-    nodeStudent *temp, *ptr;
-    ptr = (nodeStudent*)malloc(sizeof(struct nodeStudent));
-    temp = (nodeStudent*)malloc(sizeof(struct nodeStudent));
-    temp -> next = NULL;
-
+snode * insort(snode * head, int id, int grade){
+    snode *temp, *ptr = (snode*)malloc(sizeof(struct nodeStudent)), *t = (snode*)malloc(sizeof(struct nodeStudent));
     ptr -> midterm = grade;
     ptr -> studentID = id;
     ptr -> next = NULL;
-
-    if(head == NULL) {
-        //printf("holy shit");
-        head = temp;
+    temp = head;
+    if(head == NULL || head -> midterm < grade) {
+        ptr->next = head;
+        head = ptr;
+        return head;
     }
-    else{
-        temp = head;
-        while(temp -> next != NULL)
-            temp = temp -> next;
-        temp -> next = ptr;
-    }
-    return head;
-
-}
-
-
-void createNodeClass(nodeClass **head){
-    *head = (nodeClass *)malloc(sizeof(nodeClass));
-    nodeClass *temp = *head;
-    for(int i = 0; i < 5; i++) {
-        temp->classID = i;
-        temp -> studentPtr = NULL;
-        if (i < 4)
-            temp -> next = (struct nodeClass *) malloc(sizeof(struct nodeClass));
-        else
-            temp->next = NULL;
+    while(temp -> next != NULL && temp -> next -> midterm > grade){
+        printf("passing\n");
         temp = temp->next;
     }
+    ptr -> next = temp -> next;
+    temp -> next = ptr;
+    return head;
 }
 
-void print(nodeClass * head){
+struct nodeClass* createClass(struct nodeClass *head)
+{
+    struct nodeClass *tempClassHead = head;
+    int i = 0;
+    while (i < 4)
+    {
+        struct nodeClass *newNode = (struct nodeClass *)malloc(sizeof(struct nodeClass));
+        newNode->next = NULL;
+        newNode->classID = i + 1;
+        newNode->studentPtr = NULL;
+        if (tempClassHead == NULL)
+        {
+            tempClassHead = newNode;
+            head=newNode;
+            i++;
+            continue;
+        }
+        if (tempClassHead->next == NULL)
+        {
+            tempClassHead->next = newNode;
+            tempClassHead = newNode;
+        }
+        i++;
+    }
+    return head;
+}
+
+void printA(struct nodeClass *head){
     printf("id\tgrade\n");
+    snode * temp;
+    while(head != NULL){
+        temp = head -> studentPtr;
+
+        if(temp == NULL)
+            printf("null, won't print\n");
+        while(temp != NULL){
+            printf("%d\t%d\n", temp -> studentID, temp -> midterm);
+            temp = temp -> next;
+        }printf("classid: %d^^\n", head -> classID);
+        head = head ->next;
+    }
+
 
 }
-// You must write all the function definitions to be used in this lab into this file.
-// You may also write other functions that may be called from our functions.
-// Do not make any changes to the main.c file.
-// Upload function.h file to the system as StudentNumber.h.
-
